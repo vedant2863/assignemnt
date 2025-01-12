@@ -2,21 +2,23 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { Box, TextField, Button, Typography, Container } from "@mui/material";
+import useAuthStore from "@/store/authStore";
 
 export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const { setIsAuthenticated } = useAuthStore(); // Zustand hook
   const router = useRouter();
 
-  const handleLogin = async () => {
+  const handleRegister = async () => {
     if (!email || !password) {
       setError("Email and password are required");
       return;
     }
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/user/login`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/user/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -27,15 +29,13 @@ export default function RegisterPage() {
       const data = await response.json();
 
       if (response.ok) {
-        // Assuming the backend sends a token upon successful login
-        localStorage.setItem("isAuthenticated", "true");
-        router.push("/dashboard");
+        setIsAuthenticated(true); // Set Zustand auth state
+        router.push("/dashboard"); // Redirect to dashboard
       } else {
-        // Use the error message from the backend, if provided
-        setError(data.message || "Invalid email or password");
+        setError(data.message || "Failed to register. Please try again.");
       }
     } catch (error) {
-      console.error("Login error:", error);
+      console.error("Registration error:", error);
       setError("An unexpected error occurred. Please try again.");
     }
   };
@@ -44,7 +44,7 @@ export default function RegisterPage() {
     <Container maxWidth="sm">
       <Box sx={{ mt: 8 }}>
         <Typography variant="h4" align="center" gutterBottom>
-          Login
+          Register
         </Typography>
         {error && <Typography color="error">{error}</Typography>}
         <TextField
@@ -68,9 +68,9 @@ export default function RegisterPage() {
           color="primary"
           fullWidth
           sx={{ mt: 2 }}
-          onClick={handleLogin}
+          onClick={handleRegister}
         >
-          Login
+          Register
         </Button>
       </Box>
     </Container>

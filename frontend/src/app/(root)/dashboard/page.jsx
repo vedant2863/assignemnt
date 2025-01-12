@@ -21,9 +21,11 @@ import {
 } from "@mui/material";
 import { useSnackbar } from "notistack";
 import dayjs from "dayjs";
+import useAuthStore from "../stores/authStore"; // Import Zustand store
 
 export default function DashboardPage() {
   const router = useRouter();
+  const { isAuthenticated, logout } = useAuthStore(); // Zustand auth hooks
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -32,13 +34,12 @@ export default function DashboardPage() {
   const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
-    const isAuthenticated = localStorage.getItem("isAuthenticated");
     if (!isAuthenticated) {
       router.push("/login");
     } else {
       fetchData();
     }
-  }, [router]);
+  }, [isAuthenticated, router]);
 
   // Fetch data from backend using `fetch`
   const fetchData = async () => {
@@ -138,6 +139,14 @@ export default function DashboardPage() {
         sx={{ mb: 2 }}
       >
         Add New Item
+      </Button>
+      <Button
+        variant="outlined"
+        color="secondary"
+        onClick={logout}
+        sx={{ mb: 2, ml: 2 }}
+      >
+        Logout
       </Button>
       <TableContainer component={Paper}>
         <Table>

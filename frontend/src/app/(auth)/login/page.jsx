@@ -2,12 +2,13 @@
 import { useState } from "react";
 import { Box, TextField, Button, Typography, Container } from "@mui/material";
 import { useRouter } from "next/navigation";
+import useAuthStore from "@/store/authStore";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-
+  const { setIsAuthenticated } = useAuthStore(); // Zustand hook
   const router = useRouter();
 
   const handleLogin = async () => {
@@ -28,7 +29,7 @@ export default function LoginPage() {
       const data = await response.json();
 
       if (response.ok) {
-        localStorage.setItem("isAuthenticated", "true");
+        setIsAuthenticated(true); // Set Zustand auth state
         router.push("/dashboard"); // Redirect to dashboard
       } else {
         setError(data.message || "Invalid email or password");
